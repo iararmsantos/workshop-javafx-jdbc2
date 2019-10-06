@@ -3,7 +3,10 @@ package gui;
 
 import application.Main;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,6 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.entities.Department;
+import model.services.DepartmentService;
 
 /**
  * FXML Controller class
@@ -20,27 +24,37 @@ import model.entities.Department;
  * @author Iara Santos
  */
 public class DepartmentListController implements Initializable {
+    //instanciado sem injecao de dependencia
+    private DepartmentService service;
 
     @FXML
     private TableView<Department> tableViewDepartment;
-    @FXML
-    private Button btNew;
+    
     @FXML
     private TableColumn<Department , Integer> tableColumnId;
+    
     @FXML
     private TableColumn<Department, String> tableColumnName;
-
     
+    @FXML
+    private Button btNew;        
+
+    private ObservableList<Department> obsList;
+    
+    @FXML
+    private void onBtNewAction() {
+        System.out.println("onBtNewAction");
+    }
+    
+    //inversao de controle
+    public void setDepartmentService(DepartmentService service){
+        this.service = service;
+    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-      
-    }    
-
-    @FXML
-    private void onBtNewAction(ActionEvent event) {
-        System.out.println("onBtNewAction");
-    }
+      initializeNode();
+    }   
     
     private void initializeNode() {
         tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -50,4 +64,12 @@ public class DepartmentListController implements Initializable {
         tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
     }
     
+    public void updateTableView(){
+        if(service == null){
+            throw new IllegalStateException("Service was null");
+        }
+        List<Department> list = service.findAll();
+        obsList = FXCollections.observableArrayList(list);
+        tableViewDepartment.setItems(obsList);
+    }
 }
