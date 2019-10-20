@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import javafx.collections.FXCollections;
@@ -31,7 +32,7 @@ import model.services.DepartmentService;
  *
  * @author Iara Santos
  */
-public class DepartmentListController implements Initializable {
+public class DepartmentListController implements Initializable, DataChangeListener {
     //instanciado sem injecao de dependencia
     private DepartmentService service;
 
@@ -95,6 +96,10 @@ public class DepartmentListController implements Initializable {
             
             //injetando dependencia
             controller.setDepartmentService(new DepartmentService());
+            
+            //inscreve para o evento event
+            controller.subscribeDataChangeListener(this);
+            
             //load form
             controller.updateFormDate();
 
@@ -108,5 +113,10 @@ public class DepartmentListController implements Initializable {
         } catch (IOException e) {
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
         }
+    }
+
+    @Override
+    public void onDataChanged() {
+        updateTableView();
     }
 }
